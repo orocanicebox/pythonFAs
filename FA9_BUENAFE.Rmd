@@ -1,0 +1,189 @@
+---
+title: "FA9BUENAFE"
+output:
+  html_document: default
+  pdf_document: default
+  word_document: default
+date: "2024-04-23"
+---
+
+```{r setup, echo=FALSE}
+library(e1071)
+library(ggplot2)
+Result <- read.csv("/Users/periperipapi/Documents/python/Pfa9data.csv")
+
+```
+
+
+```{r result, echo=FALSE}
+print(Result)
+```
+
+
+
+```{r COUNT, echo=FALSE}
+
+count=colSums(!is.na(Result))
+print(count)
+```
+```{r prof}
+PROFmean= mean(Result$PROF)
+PROFmedian= median(Result$PROF)
+PROFsdv= sd(Result$PROF)
+PROFSEM= PROFsdv/sqrt(length(Result$PROF))
+PROFcv= (PROFsdv/PROFmean)
+
+ASSOCPROF= Result$PROF1
+length=length(ASSOCPROF[!is.na(ASSOCPROF)])
+
+ASSOCPROFmean= mean(Result$PROF1,na.rm=TRUE)
+ASSOCPROFmedian= median(Result$PROF1,na.rm=TRUE)
+ASSOCPROFsdv= sd(Result$PROF1,na.rm=TRUE)
+ASSOCPROFSEM= ASSOCPROFsdv/sqrt(length)
+ASSOCcv= (ASSOCPROFsdv/ASSOCPROFmean)
+
+
+ASSTPROF= Result$PROF2
+length2=length(ASSTPROF[!is.na(ASSTPROF)])
+
+ASSTPROFmean= mean(Result$PROF2,na.rm=TRUE)
+ASSTPROFmedian= median(Result$PROF2,na.rm=TRUE)
+ASSTPROFsdv= sd(Result$PROF2,na.rm=TRUE)
+ASSTPROFSEM= ASSTPROFsdv/sqrt(length2)
+ASSTcv= (ASSTPROFsdv/ASSTPROFmean)
+
+#TABLE
+MEASURE <- c("MEAN", "MEDIAN", "STD.DEVIATION", "STD.ERROR OF MEAN", "COEFFICIENT VARIATION")
+column2 <- c(PROFmean, PROFmedian, PROFsdv, PROFSEM, PROFcv)
+column3 <- c(ASSOCPROFmean, ASSOCPROFmedian, ASSOCPROFsdv, ASSOCPROFSEM, ASSOCcv)
+column4 <- c(ASSTPROFmean, ASSTPROFmedian, ASSTPROFsdv, ASSTPROFSEM, ASSTcv)
+TABLE<- data.frame(SUMMARY = MEASURE, PROF = column2, ASSOCPROF = column3, ASSTPROF = column4)
+print(TABLE)
+```
+
+
+```{r KURTOSIS & SKEWNESS}
+PROF= Result$PROF
+length=length(PROF[!is.na(PROF)])
+
+ASSOCPROF= Result$PROF1
+length2=length(ASSOCPROF[!is.na(ASSOCPROF)])
+
+ASSTPROF= Result$PROF2
+length3=length(ASSTPROF[!is.na(ASSTPROF)])
+
+#skewness
+PROFskew= skewness(Result$PROF)
+ASSOCPROFskew= skewness(Result$PROF1, na.rm=TRUE)
+ASSTPROFskew= skewness(Result$PROF2, na.rm=TRUE)
+
+#standard error of skewness
+PROFses= sqrt(6/length)
+ASSOCPROFses= sqrt(6/length2)
+ASSTPROFses= sqrt(6/length3)
+
+#kurtosis
+PROFkurt= kurtosis(Result$PROF)
+ASSOCPROFkurt= kurtosis(Result$PROF1, na.rm=TRUE)
+ASSTPROFkurt= kurtosis(Result$PROF2, na.rm=TRUE)
+
+#standard error of skewness
+PROFsek= sqrt(24/length)
+ASSOCPROFsek= sqrt(24/length2)
+ASSTPROFsek= sqrt(24/length3)
+
+#TABLE
+MEASURE <- c("SKEWNESS", "STD. ERROR OF SKEWNESS", "KURTOSIS", "STD.ERROR OF KURTOSIS")
+column2 <- c(PROFskew, PROFses, PROFkurt, PROFsek)
+column3 <- c(ASSOCPROFskew, ASSOCPROFses, ASSOCPROFkurt, ASSOCPROFsek)
+column4 <- c(ASSTPROFskew, ASSTPROFses, ASSTPROFkurt, ASSTPROFsek)
+TABLE2<- data.frame(SUMMARY = MEASURE, PROF = column2, ASSOCPROF = column3, ASSTPROF = column4)
+print(TABLE2)
+
+```
+
+
+```{r SKEWNESS plot}
+#skewness plot of PROF
+ggplot(Result, aes(x=PROF), na.rm=TRUE)+geom_density(fill="steelblue", color="black", alpha=1)+
+  labs(title="Skewness of SALARY OF PROF", x="SALARY",y="Frequency")+ theme_minimal()
+#skewness plot of ASSOCPROF
+ggplot(Result, aes(x=ASSOCPROF), na.rm=TRUE)+geom_density(fill="steelblue", color="black", alpha=1)+
+  labs(title="Skewness of SALARY OF ASSOC PROF", x="SALARY",y="Frequency")+ theme_minimal()
+#skewness plot of ASSTPROF
+ggplot(Result, aes(x=ASSTPROF), na.rm=TRUE)+geom_density(fill="steelblue", color="black", alpha=1)+
+  labs(title="Skewness of SALARY OF ASST PROF", x="SALARY",y="Frequency")+ theme_minimal()
+```
+```{r plot}
+PROF25= quantile(Result$PROF,0.25)
+PROF50= quantile(Result$PROF,0.50)
+PROF75= quantile(Result$PROF,0.75)
+
+ASSOCPROF25= quantile(Result$PROF1, na.rm=TRUE,0.25)
+ASSOCPROF50= quantile(Result$PROF1, na.rm=TRUE,0.50)
+ASSOCPROF75= quantile(Result$PROF1, na.rm=TRUE,0.75)
+
+ASSTPROF25= quantile(Result$PROF2, na.rm=TRUE,0.25)
+ASSTPROF50= quantile(Result$PROF2, na.rm=TRUE,0.50)
+ASSTPROF75= quantile(Result$PROF2, na.rm=TRUE,0.75)
+
+#TABLE
+MEASURE <- c("25TH QUANTILE", "50TH QUANTILE", "75TH QUANTILE")
+column2 <- c(PROF25, PROF50, PROF75)
+column3 <- c(ASSOCPROF25, ASSOCPROF50, ASSOCPROF75)
+column4 <- c(ASSTPROF25, ASSTPROF50, ASSTPROF75)
+TABLE4<- data.frame(QUANTILE = MEASURE, PROF = column2, ASSOCPROF = column3, ASSTPROF = column4)
+print(TABLE4)
+
+
+ggplot(Result, aes(x = factor(1), y = PROF)) +
+  geom_boxplot(fill = "skyblue", color = "black", alpha = 0.7) +
+  geom_boxplot(aes(x = factor(2), y = ASSOCPROF), fill = "lightgreen", color = "black", alpha = 0.7) +
+  geom_boxplot(aes(x = factor(3), y = ASSTPROF), fill = "yellow", color = "black", alpha = 0.7) +
+  labs(title = "COMPARISON OF SALARY BETWEEN PROF, ASSOC PROF, & ASST PROF", 
+       x = "Rank",
+       y = "Salary") +
+  scale_x_discrete(labels = c("PROF", "ASSOC PROF", "ASST PROF")) +
+  theme_minimal()
+```
+
+```{r MINMAX}
+PROFmax= max(Result$PROF)
+PROFmin= min(Result$PROF)
+
+ASSOCPROFmax= max(Result$PROF1, na.rm=TRUE)
+ASSOCPROFmin= min(Result$PROF1, na.rm=TRUE)
+
+ASSTPROFmax= max(Result$PROF2, na.rm=TRUE)
+ASSTPROFmin= min(Result$PROF2, na.rm=TRUE)
+
+#TABLE
+MEASURE <- c("MAXIMUM", "MINIMUM")
+column2 <- c(PROFmax, PROFmin)
+column3 <- c(ASSOCPROFmax, ASSOCPROFmin)
+column4 <- c(ASSTPROFmax, ASSTPROFmin)
+TABLE3<- data.frame(SUMMARY = MEASURE, PROF = column2, ASSOCPROF = column3, ASSTPROF = column4)
+print(TABLE3)
+```
+
+
+```{r 1090}
+PROF= quantile(Result$PROF,c(0.10, 0.20, 0.30, 0.40, 0.50, 0.60, 0.70, 0.80, 0.90))
+ASSOCPROF= quantile(Result$PROF1, na.rm="TRUE",c(0.10, 0.20, 0.30, 0.40, 0.50, 0.60, 0.70, 0.80, 0.90))
+ASSTPROF= quantile(Result$PROF2, na.rm="TRUE", c(0.10, 0.20, 0.30, 0.40, 0.50, 0.60, 0.70, 0.80, 0.90))
+
+
+
+#TABLE
+TABLE5<- data.frame(Quantile = c("10th", "20th", "30th", "40th", "50th", "60th", "70th", "80th", "90th"),
+                              PROF_SALARY = PROF)
+
+TABLE6<- data.frame(Quantile = c("10th", "20th", "30th", "40th", "50th", "60th", "70th", "80th", "90th"),
+                              ASSOCPROF_SALARY = ASSOCPROF)
+
+TABLE7<- data.frame(Quantile = c("10th", "20th", "30th", "40th", "50th", "60th", "70th", "80th", "90th"),
+                              ASSTPROF_SALARY = ASSTPROF)
+print(TABLE5)
+print(TABLE6)
+print(TABLE7)
+```
